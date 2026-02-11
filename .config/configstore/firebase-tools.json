@@ -1,0 +1,78 @@
+{
+	"motd": {
+		"cloudBuildErrorAfter": 1594252800000,
+		"cloudBuildWarnAfter": 1590019200000,
+		"defaultNode10After": 1594252800000,
+		"minVersion": "3.0.5",
+		"node8DeploysDisabledAfter": 1613390400000,
+		"node8RuntimeDisabledAfter": 1615809600000,
+		"node8WarnAfter": 1600128000000,
+		"fetched": 1708747669201
+	},
+	"usage": true,
+	"analytics-uuid": "44c62fd9-bb3e-4fb4-9283-b6191c11b046",
+	"user": {
+		"iss": "accounts.google.com",
+		"azp": "563584335869-fgrhgmd47bqnekij5i8b5pr03ho849e6.apps.googleusercontent.com",
+		"aud": "563584335869-fgrhgmd47bqnekij5i8b5pr03ho849e6.apps.googleusercontent.com",
+		"sub": "112864651916143865824",
+		"email": "abhisheksharma89928@gmail.com",
+		"email_verified": true,
+		"at_hash": "X_71AKf_SpffUp3av7xv9Q",
+		"iat": 1697536745,
+		"exp": 1697540345
+	},
+	"tokens": {
+		"expires_at": 1708751585050,
+		"refresh_token": "1//0gsNgRy7YSUn_CgYIARAAGBASNwF-L9IrEH9vT6XMyvrTvlHVotVLrUZnTc1-0nmcvpBpRoxDaFGZMbEyhvFZwrtDL8R2xL3AHXQ",
+		"scopes": [],
+		"access_token": "ya29.a0AfB_byBhinWj_dRi488vN-OY_JVHcTLh_a6Q-rfijvvsRW6mTRd1s_Cw7BjFIeyo_UPTvmp2Z_rqTXfUojFeByZDQQXjzGzOSHkfpSrFvS7Wwr2alWvxRRsCME-AwDtwS8aX0nPLF7C_FSq4AQNoZYQIVmqmNIAOHTUTvHW1DwRpaCgYKAZQSARASFQHGX2MibjzSCOZmTDwDaWWcocwrtQ0179",
+		"expires_in": 3599,
+		"scope": "https://www.googleapis.com/auth/cloud-platform https://www.googleapis.com/auth/cloudplatformprojects.readonly https://www.googleapis.com/auth/firebase https://www.googleapis.com/auth/userinfo.email openid",
+		"token_type": "Bearer",
+		"id_token": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjU1YzE4OGE4MzU0NmZjMTg4ZTUxNTc2YmE3MjgzNmUwNjAwZThiNzMiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJhY2NvdW50cy5nb29nbGUuY29tIiwiYXpwIjoiNTYzNTg0MzM1ODY5LWZncmhnbWQ0N2JxbmVraWo1aThiNXByMDNobzg0OWU2LmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwiYXVkIjoiNTYzNTg0MzM1ODY5LWZncmhnbWQ0N2JxbmVraWo1aThiNXByMDNobzg0OWU2LmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwic3ViIjoiMTEyODY0NjUxOTE2MTQzODY1ODI0IiwiZW1haWwiOiJhYmhpc2hla3NoYXJtYTg5OTI4QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhdF9oYXNoIjoidzdPaXlQeEoyMk9CajBqYVBmVzhCUSIsImlhdCI6MTcwODc0Nzk4NSwiZXhwIjoxNzA4NzUxNTg1fQ.g9AIFGG5ZSdhLkgH8xojR4kreIzJI5hX4jy38Q8D1g8XwN7oC1ou2vsMS5lP1l-4BqzFn2QonoluxD7BOI1Y5Var-UJd3mo4LCiiIfIjEuzIOeRJkbRhkYEepwi56OG7ZpJbbf54ne44D3HM13pv8gLxnigrmcF3oG9juHuZ-AUCbDkQMyw4YpIk8UODkgZkL39CatSSUxQ4vjTNn71-TO5pM-L0uWEGo9ut2zjKAnpPUIkW24SopGvODDoHvuL81sTchVYER_Ivh6j5Ffe6zdiCOaPDxONSuHLQdW0YdCMfRjTC1ky31fv1LPBDNn3M5k6yBzKJFrsNYkbdY3kdow"
+	},
+	"activeProjects": {
+		"C:\\Users\\abhi\\Desktop\\Portfolio": "portfolio-b4b4a",
+		"C:\\Users\\abhi\\Desktop\\Amazon-clone (2)": "fir-19478",
+		"C:\\Users\\abhi\\Desktop\\Responsive-Car-website-main": "responsive-website-e217a",
+		"C:\\Users\\abhi\\Desktop\\rental-car-website-main": "task-66859",
+		"C:\\Users\\abhi\\Desktop\\Youtube": "clone-by-react",
+		"C:\\Users\\abhi\\Desktop\\port": "myportfolio-a8947",
+		"C:\\Users\\abhi\\Desktop\\portfolio": "myportfolio-a8947",
+		"C:\\Users\\abhi\\Desktop\\new portfolio": "portfolio-new-1c6fb",
+		"C:\\Users\\abhi\\Desktop\\Portfolioooo": "portfolio-b4b4a",
+		"C:\\Users\\abhi\\Desktop\\netflix cone": "fir-19478",
+		"C:\\Users\\abhi\\Desktop\\Youtubeclone": "clone-by-react",
+		"C:\\Users\\abhi\\Desktop\\atg new": "instagram-17c9c",
+		"C:\\Users\\abhi\\Desktop\\romo website": "chat-4dd8b",
+		"C:\\Users\\abhi\\Desktop\\atg free": "atga-d25d5",
+		"C:\\Users\\abhi\\Desktop\\abhishek portfolio": "instagram-17c9c",
+		"C:\\Users\\abhi\\Desktop\\e-com\\public": "myportfolio-bde37",
+		"C:\\Users\\abhi\\Desktop\\website": "website-84ee1"
+	},
+	"emulator-analytics-clientId": "1c0939e5-ef20-4977-abb8-9cc11e0109d1",
+	"webconfig": {
+		"portfolio-b4b4a": {
+			"projectId": "portfolio-b4b4a",
+			"storageBucket": "portfolio-b4b4a.appspot.com",
+			"apiKey": "AIzaSyD3uP8inncTV1w-LVPK0eT4ePDnnlhJ27Y",
+			"authDomain": "portfolio-b4b4a.firebaseapp.com",
+			"messagingSenderId": "895462418851"
+		},
+		"myportfolio-bde37": {
+			"projectId": "myportfolio-bde37",
+			"storageBucket": "myportfolio-bde37.appspot.com",
+			"apiKey": "AIzaSyADirFND1UGE9WnB8U-lv1DeyFOLhL_dNw",
+			"authDomain": "myportfolio-bde37.firebaseapp.com",
+			"messagingSenderId": "334230101736"
+		},
+		"portfolio-new-1c6fb": {
+			"projectId": "portfolio-new-1c6fb",
+			"storageBucket": "portfolio-new-1c6fb.appspot.com",
+			"apiKey": "AIzaSyBuho3CFtWSCnhO2YKNEp7LVX6r1KUw8Yc",
+			"authDomain": "portfolio-new-1c6fb.firebaseapp.com",
+			"messagingSenderId": "479770065510"
+		}
+	}
+}

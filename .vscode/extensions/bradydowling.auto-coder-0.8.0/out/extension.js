@@ -1,0 +1,409 @@
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.deactivate = exports.activate = void 0;
+// The module 'vscode' contains the VS Code extensibility API
+const vscode = require("vscode");
+const fs = require("fs");
+const path = require("path");
+const player_1 = require("./player/player");
+let currentPageNum = 0;
+// this method is called when your extension is activated
+// your extension is activated the very first time the command is executed
+function activate(context) {
+    // Use the console to output diagnostic information (console.log) and errors (console.error)
+    // This line of code will only be executed once when your extension is activated
+    console.log('Congratulations, your extension "auto-type" is now active!');
+    const resetCodeScriptCommand = vscode.commands.registerCommand('extension.resetCodeScript', () => {
+        currentPageNum = 0;
+    });
+    context.subscriptions.push(resetCodeScriptCommand);
+    const completeCodeScriptCommand = vscode.commands.registerCommand('extension.completeCodeScript', () => {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) {
+            return;
+        }
+        const ws = vscode.workspace;
+        if (!vscode.workspace.workspaceFolders) {
+            return;
+        }
+        const rootDir = vscode.workspace.workspaceFolders[0].uri.fsPath;
+        const scriptDirName = '.auto-type';
+        const scriptDir = path.join(rootDir, scriptDirName);
+        let scriptPages;
+        try {
+            scriptPages = loadScript(scriptDir);
+        }
+        catch (e) {
+            vscode.window.showWarningMessage(e);
+            return;
+        }
+        if (currentPageNum >= scriptPages.length) {
+            vscode.window.showInformationMessage('No more script pages.');
+            return;
+        }
+        const scriptPage = scriptPages[currentPageNum];
+        currentPageNum += 1;
+        const files = scriptPages.map(scriptPage => scriptPage.file);
+        const docPromises = files.map(file => {
+            const fqfn = (file.indexOf('/') === 0) ? file : path.join(rootDir, file);
+            return ws.openTextDocument(fqfn).then(doc => {
+                vscode.window.showTextDocument(doc, { preview: false });
+            });
+        });
+        Promise.all(docPromises).then(() => {
+            const docs = ws.textDocuments;
+            const changeDoc = docs.find(doc => doc.fileName.indexOf(scriptPage.file) > -1);
+            if (!changeDoc) {
+                return;
+            }
+            vscode.window.showTextDocument(changeDoc).then(() => {
+                const range = changeDoc.lineAt(scriptPage.line).range;
+                if (vscode.window.activeTextEditor) {
+                    vscode.window.activeTextEditor.selection = new vscode.Selection(range.start, range.end);
+                    vscode.window.activeTextEditor.revealRange(range, scriptPage.align);
+                }
+                const pos = new vscode.Position(scriptPage.line, scriptPage.col);
+                const changeText = typeof (scriptPage.content) === 'string' ? scriptPage.content : scriptPage.content.join('');
+                type(changeText, pos);
+            });
+        });
+    });
+    context.subscriptions.push(completeCodeScriptCommand);
+    // The command has been defined in the package.json file
+    // Now provide the implementation of the command with  registerCommand
+    // The commandId parameter must match the command field in package.json
+    const playCodeScriptCommand = vscode.commands.registerCommand('extension.playCodeScript', () => {
+        // The code you place here will be executed every time your command is executed
+        let editor = vscode.window.activeTextEditor;
+        if (!editor) {
+            return;
+        }
+        let ws = vscode.workspace;
+        if (!vscode.workspace.workspaceFolders) {
+            return;
+        }
+        const rootDir = vscode.workspace.workspaceFolders[0].uri.fsPath;
+        const scriptDirName = '.auto-type';
+        const scriptDir = path.join(rootDir, scriptDirName);
+        let scriptPages;
+        try {
+            scriptPages = loadScript(scriptDir);
+        }
+        catch (e) {
+            vscode.window.showWarningMessage(e);
+            return;
+        }
+        if (currentPageNum >= scriptPages.length) {
+            vscode.window.showInformationMessage('No more script pages.');
+            return;
+        }
+        let scriptPage = scriptPages[currentPageNum];
+        currentPageNum += 1;
+        let files = scriptPages.map(scriptPage => scriptPage.file);
+        let docPromises = files.map(file => {
+            let fqfn = (file.indexOf('/') === 0) ? file : path.join(rootDir, file);
+            return ws.openTextDocument(fqfn).
+                then(doc => {
+                vscode.window.showTextDocument(doc, { preview: false });
+            });
+        });
+        Promise.all(docPromises).then(() => {
+            const docs = ws.textDocuments;
+            const changeDoc = docs.find(doc => doc.fileName.indexOf(scriptPage.file) > -1);
+            if (!changeDoc) {
+                return;
+            }
+            vscode.window.showTextDocument(changeDoc).then(() => {
+                const range = changeDoc.lineAt(scriptPage.line).range;
+                if (vscode.window.activeTextEditor) {
+                    vscode.window.activeTextEditor.selection = new vscode.Selection(range.start, range.end);
+                    vscode.window.activeTextEditor.revealRange(range, scriptPage.align);
+                }
+                const pos = new vscode.Position(scriptPage.line, scriptPage.col);
+                const changeText = typeof (scriptPage.content) === 'string' ? scriptPage.content : scriptPage.content.join('');
+                type(changeText, pos);
+            });
+        });
+    });
+    context.subscriptions.push(playCodeScriptCommand);
+}
+exports.activate = activate;
+function loadScript(scriptDir) {
+    if (!fs.existsSync(scriptDir)) {
+        vscode.window.showWarningMessage(`The script directory ${scriptDir} does not exist. Nothing for auto-type to do.`);
+        return [];
+    }
+    const pages = fs.readdirSync(scriptDir);
+    if (!pages.length) {
+        vscode.window.showWarningMessage(`No script pages found in ${scriptDir}. Nothing for auto-type to do.`);
+        return [];
+    }
+    return pages.map(pageName => {
+        return parseScriptPage(pageName, scriptDir);
+    });
+}
+function parseScriptPage(pageName, scriptDir) {
+    const pagePath = path.join(scriptDir, pageName);
+    const fullContent = fs.readFileSync(pagePath, { encoding: 'utf-8' });
+    const parts = fullContent.split(/\n\-\-\-\n/m);
+    let frontMatter, content;
+    try {
+        frontMatter = parseFrontMatter(parts[0]);
+        content = parts[1];
+    }
+    catch (e) {
+        throw new Error(`${e} in script page ${pagePath}`);
+    }
+    const options = {
+        file: frontMatter.file,
+        name: pageName,
+        path: pagePath,
+        content: content,
+        line: frontMatter.line,
+        col: frontMatter.col,
+        align: frontMatter.align,
+    };
+    if (!options.file) {
+        throw new Error("Missing file property");
+    }
+    if (!fs.existsSync(options.file) && !fs.existsSync(scriptDir + '/../' + options.file)) {
+        throw new Error(`Can't find target file  ${options.file}`);
+    }
+    return options;
+}
+function parseFrontMatter(text) {
+    const rawOptions = text.split("\n").reduce((accumulator, line) => {
+        const [lineKey, lineVal] = line.split(/\s*:\s*/);
+        return Object.assign({ [lineKey]: lineVal }, accumulator);
+    }, {});
+    // Either parse the provided line or use 1, then 0-index it
+    const line = (rawOptions.line ? parseInt(rawOptions.line, 10) : 1) - 1;
+    const col = (rawOptions.col ? parseInt(rawOptions.col, 10) : 1) - 1;
+    // See https://code.visualstudio.com/api/references/vscode-api#TextEditorRevealType
+    const align = rawOptions.align || 'middle';
+    const newAlign = align === 'middle' ? 2 : 3;
+    return {
+        file: rawOptions.file,
+        line,
+        col,
+        align: newAlign
+    };
+}
+function timedCharacterType(text, currentPosition, delay) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor || !text || text.length === 0) {
+            return;
+        }
+        triggerKeySound();
+        let { newPosition, char } = getTypingInfo(text, currentPosition, editor);
+        yield editor.edit(editBuilder => {
+            if (char !== '⌫') {
+                editBuilder.insert(newPosition, char);
+            }
+            else {
+                let selection = new vscode.Selection(newPosition, currentPosition);
+                editBuilder.delete(selection);
+                char = '';
+            }
+            let newSelection = new vscode.Selection(newPosition, newPosition);
+            if (char === "\n") {
+                newSelection = new vscode.Selection(currentPosition, currentPosition);
+                newPosition = new vscode.Position(currentPosition.line + 1, 0);
+                char = '';
+            }
+            editor.selection = newSelection;
+        });
+        yield pause(delay);
+        return {};
+    });
+}
+function pause(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+function getTypingInfo(text, currentPosition, editor) {
+    const char = text.substring(0, 1);
+    // Moving cursor
+    if (char === '↓') {
+        return {
+            newPosition: new vscode.Position(currentPosition.line + 1, currentPosition.character),
+            char: '',
+        };
+    }
+    if (char === '↑') {
+        return {
+            newPosition: new vscode.Position(currentPosition.line - 1, currentPosition.character),
+            char: '',
+        };
+    }
+    if (char === '→') {
+        return {
+            newPosition: new vscode.Position(currentPosition.line, currentPosition.character + 1),
+            char: '',
+        };
+    }
+    if (char === '←') {
+        return {
+            newPosition: new vscode.Position(currentPosition.line, currentPosition.character - 1),
+            char: '',
+        };
+    }
+    if (char === '⇤') {
+        return {
+            newPosition: new vscode.Position(currentPosition.line, 0),
+            char: '',
+        };
+    }
+    if (char === '⇥') {
+        return {
+            newPosition: editor.document.lineAt(currentPosition.line).range.end,
+            char: '',
+        };
+    }
+    if (char === '⌫') {
+        // Delete char left
+        const newCol = currentPosition.character > 0 ? currentPosition.character - 1 : 0;
+        return {
+            newPosition: new vscode.Position(currentPosition.line, newCol),
+            char,
+        };
+    }
+    if (char === '⌦') {
+        // Delete char right
+        const endChar = editor.document.lineAt(currentPosition.line).range.end.character;
+        const newCol = currentPosition.character < endChar ? currentPosition.character + 1 : currentPosition.character;
+        return {
+            newPosition: new vscode.Position(currentPosition.line, newCol),
+            char,
+        };
+    }
+    if (char === '↚') {
+        // Delete all left
+        return {
+            newPosition: new vscode.Position(currentPosition.line, 0),
+            char,
+        };
+    }
+    if (char === '↛') {
+        // Delete all right
+        return {
+            newPosition: editor.document.lineAt(currentPosition.line).range.end,
+            char,
+        };
+    }
+    if (char === '⌧') {
+        // Remove the line completely
+        return {
+            newPosition: new vscode.Position(currentPosition.line, currentPosition.character - 1),
+            char,
+        };
+    }
+    if (char === '¬') {
+        // No op (pause)
+        return {
+            newPosition: new vscode.Position(currentPosition.line, currentPosition.character),
+            char: '',
+        };
+    }
+    // Normal text insertion
+    return {
+        newPosition: currentPosition,
+        char,
+    };
+}
+const triggerKeySound = () => {
+    const soundEffectSettings = [
+        'none',
+        'macbook',
+        'keyboard',
+        'hacker',
+    ];
+    const config = vscode.workspace.getConfiguration('autoCoder');
+    const soundEffectSetting = config.get('soundEffects', 'none');
+    if (soundEffectSettings.indexOf(soundEffectSetting) < 1) {
+        return;
+    }
+    const playerConfig = {
+        macVol: 5,
+        winVol: 5,
+        linuxVol: 5,
+    };
+    player_1.play('key', soundEffectSetting, playerConfig);
+};
+const getCharacterTypeDelay = () => {
+    const config = vscode.workspace.getConfiguration('autoCoder');
+    const baseDelay = config.get('characterDelayBase', 20);
+    const variableDelay = config.get('characterDelayVariation', 80);
+    return baseDelay + variableDelay * Math.random();
+};
+function type(textRemaining, currentPosition) {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor || !textRemaining || textRemaining.length === 0) {
+        return;
+    }
+    triggerKeySound();
+    let { newPosition, char } = getTypingInfo(textRemaining, currentPosition, editor);
+    const deletionCharacters = ['⌫', '⌦', '↚', '↛'];
+    editor.edit(editBuilder => {
+        if (deletionCharacters.indexOf(char) > -1) {
+            let selection = new vscode.Selection(newPosition, currentPosition);
+            editBuilder.delete(selection);
+            char = '';
+        }
+        else if (char === '⌧') {
+            const currentLineStart = editor.document.lineAt(currentPosition.line).range.start;
+            const currentLineEnd = editor.document.lineAt(currentPosition.line).range.end;
+            const nextLineStart = editor.document.lineAt(currentPosition.line + 1).range.start;
+            const isLastLine = false; // TODO: This fails on the last line of a file
+            const endSelection = isLastLine ? currentLineEnd : nextLineStart;
+            let selection = new vscode.Selection(endSelection, currentLineStart);
+            editBuilder.delete(selection);
+            // TODO: Set newPosition
+            char = '';
+        }
+        else {
+            editBuilder.insert(newPosition, char);
+            // TODO: Add horizontal limit
+            // TODO: Fix issue on newline (doesn't focus until character is typed)
+            const isAtVerticalLimit = newPosition.line > editor.visibleRanges[0].end.line - 1;
+            if (isAtVerticalLimit) {
+                const range = {
+                    start: newPosition,
+                    end: newPosition,
+                };
+                editor.revealRange(range, 0);
+                // vscode.commands.executeCommand("revealLine", { // This could also work, it's used in https://github.com/kaiwood/vscode-center-editor-window/blob/master/src/extension.ts#L60
+                //   lineNumber: newPosition.line,
+                //   at: "bottom"
+                // });
+            }
+        }
+        let newSelection = new vscode.Selection(newPosition, newPosition);
+        if (char === "\n") {
+            newSelection = new vscode.Selection(currentPosition, currentPosition);
+            newPosition = new vscode.Position(currentPosition.line + 1, 0);
+            char = '';
+        }
+        editor.selection = newSelection;
+    }).then(() => {
+        const delay = getCharacterTypeDelay();
+        const _p = new vscode.Position(newPosition.line, char.length + newPosition.character);
+        setTimeout(() => {
+            type(textRemaining.substring(1, textRemaining.length), _p);
+        }, delay);
+    });
+}
+// this method is called when your extension is deactivated
+function deactivate() {
+}
+exports.deactivate = deactivate;
+//# sourceMappingURL=extension.js.map
